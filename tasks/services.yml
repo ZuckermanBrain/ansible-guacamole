@@ -1,5 +1,5 @@
 ---
-- name: services | Ensuring Guacamole Server Service Is Enabled And Starts On Boot
+- name: Ensuring Guacamole Server Service Is Enabled And Starts On Boot
   service:
     name: guacd
     enabled: true

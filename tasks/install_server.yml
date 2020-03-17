@@ -1,4 +1,12 @@
 ---
+- name: install | Installing Guacamole Pre-Reqs
+  package:
+    name: "{{ guacamole_prereq_pkgs }}"
+    state: present
+  become: true
+  register: result
+  until: result is successful
+
 - name: install | Downloading Guacamole Server Package
   get_url:
     url: "{{ guacamole_dl_url + '/source/' + guacamole_server_package }}"

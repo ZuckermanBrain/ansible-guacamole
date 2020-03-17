@@ -1,0 +1,25 @@
+guacamole_tomcat: tomcat
+guacamole_tomcat_service: tomcat
+guacamole_tomcat_user: tomcat
+
+guacamole_prereq_pkgs:
+  - cairo-devel
+  - libjpeg-turbo-devel
+  - libpng-devel
+  - libtool
+  - uuid-devel
+  - ffmpeg-devel
+  - freerdp-devel
+  - pango-devel
+  - libssh2-devel
+  - libtelnet-devel
+  - libvncserver-devel
+  - pulseaudio-libs-devel
+  - openssl-devel
+  - libvorbis-devel
+  - libwebp-devel
+  - "{{ guacamole_tomcat }}"
+  - gcc
+  - make
+  # - maven
+

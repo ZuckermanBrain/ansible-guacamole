@@ -1,0 +1,25 @@
+guacamole_tomcat: tomcat8
+guacamole_tomcat_service: tomcat8
+guacamole_tomcat_user: tomcat8
+
+guacamole_prereq_pkgs:
+  - libcairo2-dev
+  - libjpeg62-turbo-dev
+  - libpng-dev
+  - libtool-bin
+  - libossp-uuid-dev
+  - libavcodec-dev
+  - libavutil-dev
+  - libswscale-dev
+  - freerdp2-dev
+  - freerdp-x11
+  - libpango1.0-dev
+  - libssh2-1-dev
+  - libtelnet-dev
+  - libvncserver-dev
+  - libpulse-dev
+  - libssl-dev
+  - libvorbis-dev
+  - libwebp-dev
+  - "{{ guacamole_tomcat }}"
+  - build-essential
