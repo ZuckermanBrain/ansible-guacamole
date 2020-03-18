@@ -24,18 +24,19 @@
     - restart guacd
 
 - name: Run auth tasks
-  include_tasks: "{{ item }}"
-  with_first_found:
-    - files:
-        - 'auth_{{ guacamole_auth_provider }}.yml'
-        - 'auth_basic.yml'
-      paths:
-        - '{{ role_path }}/tasks'
+  include_tasks: "auth_{{ guacamole_auth_provider }}.yml"
+  loop: "{{ guacamole_auth_providers }}"
+  when: guacamole_auth_providers is defined
+
+# Run auth_basic if no other providers are defined.
+- name: Run auth tasks
+  include_tasks: "auth_basic.yml"
+  when: "{{ guacamole_auth_providers | default(true, true) }}"
 
 - name: Creating Tomcat symlink For guacamole.properties
   file:
     src: /etc/guacamole
-    dest: "{{ '/usr/share/' + guacamole_tomcat + '/.guacamole' }}"
+    dest: "/usr/share/{{ guacamole_tomcat }}/.guacamole"
     state: link
     owner: "{{ guacamole_tomcat_user }}"
     group: "{{ guacamole_tomcat_user }}"

@@ -1,16 +1,3 @@
-auth-provider: {{ guacamole_auth_provider }}
-{% if guacamole_basic_user_mapping is defined and guacamole_basic_user_mapping|string %}
-basic-user-mapping: {{ guacamole_basic_user_mapping }}
-{% endif %}
-guacd-hostname: {{ guacamole_server_hostname }}
-{% if guacamole_server_port is defined and guacamole_server_port|int %}
-guacd-port: {{ guacamole_server_port }}
-{% endif %}
-user-mapping: /etc/guacamole/user-mapping.xml
-{% if guacamole_mysql_auth %}
-mysql-hostname: {{ guacamole_mysql_db['host'] }}
-mysql-port: {{ guacamole_mysql_db['port'] }}
-mysql-database: {{ guacamole_mysql_db['name'] }}
-mysql-username: {{ guacamole_mysql_db['username'] }}
-mysql-password: {{ guacamole_mysql_db['password'] }}
-{% endif %}
+{% for property in guacamole_properties %}
+{{ property }}: {{ guacamole_properties[property] }}
+{% endfor %}

@@ -10,11 +10,10 @@ guacamole_redhat_fusion_repos:
 # Version number, package names, and download URL
 guacamole_version: 1.1.0
 guacamole_server_package: "guacamole-server-{{ guacamole_version }}.tar.gz"
-guacamole_server_checksum: "274851b1a39c383c4bb89a56696159c9a42f687a962d9ebc55b5bf86e5964c79"
+guacamole_server_checksum: "sha256:{{ guacamole_dl_url }}/source/{{ guacamole_server_package }}.sha256"
 guacamole_client_package: "guacamole-{{ guacamole_version }}.war"
-guacamole_client_checksum: "f46b832e919f62065506a66c936a420f572886ff8b68cbf3e31e01ca410f0f52"
-guacamole_dl_url: "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/{{guacamole_version }}"
-guacamole_src_dir: /usr/local/src
+guacamole_client_checksum: "sha256:{{ guacamole_dl_url }}/binary/{{ guacamole_client_package }}.sha256"
+guacamole_dl_url: "https://downloads.apache.org/guacamole/{{ guacamole_version }}/"
 
 # Settings that guacamole.properties will be populated with.
 # Used by: tasks/config.yml
@@ -22,18 +21,27 @@ guacamole_properties:
   guacd-hostname: localhost
   guacd-port: 4822
   #guacd-ssl: false
-  #skip-if-unavailable: mysql, ldap
+  #skip-if-unavailable: cas, ldap
   #basic-user-mapping: /etc/guacamole/user-mapping.xml
   # Note: auth-provider is deprecated as of Guacamole 0.9.7 and should only be used with older versions
   # See: https://sourceforge.net/p/guacamole/discussion/1110834/thread/8f353dd1/#175d
   #auth-provider: net.sourceforge.guacamole.net.basic.BasicFileAuthenticationProvider
-
+  # Note: use these if you are using MySQL for auth (see below).
+  #mysql-hostname: {{ guacamole_mysql_db['host'] }}
+  #mysql-port: {{ guacamole_mysql_db['port'] }}
+  #mysql-database: {{ guacamole_mysql_db['name'] }}
+  #mysql-username: {{ guacamole_mysql_db['username'] }}
+  #mysql-password: {{ guacamole_mysql_db['password'] }} 
+  # Note: use these if you are using CAS for auth.
+  #cas-authorization-endpoint: https://example.com
+  #cas-redirect-uri: https://example.net
+  #cas-clearpass-key: /path/to/key
 
 # Authentication
 # Choose an auth provider/connector.  The following should be valid values:
 # basic, cas, duo, header, mysql, postgresql, sqlserver, ldap, openid, quickconnect, totp
 # Currently, however, only basic, cas, and ldap are implemented.
-guacamole_auth_provider: cas
+guacamole_auth_providers: [cas, mysql]
 
 # Settings for basic auth
 # RDP settings
@@ -43,6 +51,7 @@ guacamole_auth_provider: cas
 #guacamole_rdp_width: 1440
 #guacamole_rdp_security: rdp
 #guacamole_rdp_ignore_cert: false
+# User definitions
 #guacamole_users:
 # - name: user1
 #   password: password
@@ -60,3 +69,23 @@ guacamole_auth_provider: cas
 #       protocol: vnc
 #       port: 5901
 #       password: password
+
+# Settings for mysql auth
+guacamole_mysql_connector_version: 8.0.13
+guacamole_mysql_connector_dl_url: https://dev.mysql.com/get/Downloads/Connector-J/
+guacamole_mysql_connector_package: "{{ guacamole_mysql_connector_dl_url }}/mysql-connector-java-{{ guacamole_mysql_connector_version }}.tar.gz"
+guacamole_auth_jdbc_package: "guacamole-auth-jdbc-{{ guacamole_version }}.tar.gz"
+guacamole_auth_jdbc_checksum: "sha256:{{ guacamole_dl_url }}/binary/{{ guacamole_auth_jdbc_package }}.sha256"
+
+# Define MySQL DB Info
+# These settings also need to make it into guacamole_properties.
+guacamole_mysql_db:
+  name: guacamole
+  host: localhost
+  port: 3306
+  username: guacamole
+  password: guacamole
+
+# Settings for CAS auth
+guacamole_auth_cas_package: "guacamole-auth-cas-{{ guacamole_version }}.tar.gz"
+guacamole_auth_cas_checksum: "sha256:{{ guacamole_dl_url }}/binary/{{ guacamole_auth_cas_package }}.sha256"

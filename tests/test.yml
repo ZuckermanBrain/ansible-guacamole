@@ -2,4 +2,5 @@
 - name: Example Playbook
   hosts: all
   roles:
+    - role: app-mysql
     - role: app-guacamole

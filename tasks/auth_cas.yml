@@ -1,0 +1,22 @@
+- name: Downloading Auth CAS Library
+  get_url:
+    url: "{{ guacamole_dl_url }}/binary/{{ guacamole_auth_cas_package }}"
+    dest: "{{ guacamole_src_dir }}"
+    checksum: "{{ guacamole_auth_cas_checksum }}"
+  become: true
+
+- name: Extracting Auth CAS Library
+  unarchive:
+    src: "{{ guacamole_dl_url }}/binary/{{ guacamole_auth_cas_package }}"
+    dest: "{{ guacamole_src_dir }}"
+  become: true
+
+- name:  Copying Auth CAS Connector
+  copy:
+    src: "{{ guacamole_src_dir }}/guacamole-auth-cas-{{ guacamole_version }}/guacamole-auth-cas-mysql-{{ guacamole_version }}.jar"
+    dest: /etc/guacamole/extensions/
+    owner: "{{ guacamole_tomcat_user }}"
+    group: "{{ guacamole_tomcat_user }}"
+    remote_src: true
+  become: true
+

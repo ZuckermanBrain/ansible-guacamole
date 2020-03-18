@@ -1,0 +1,86 @@
+---
+- name: Downloading Auth JDBC Library
+  get_url:
+    url: "{{ guacamole_dl_url }}/binary/{{ guacamole_auth_jdbc_package }}"
+    dest: "{{ guacamole_src_dir }}"
+    checksum: "{{ guacamole_auth_jdbc_checksum }}"
+  become: true
+
+- name: Extracting Auth JDBC Library
+  unarchive:
+    src: "{{ guacamole_dl_url }}/binary/{{ guacamole_auth_jdbc_package }}"
+    dest: "{{ guacamole_src_dir }}"
+  become: true
+
+- name:  Copying Auth JDBC Connector
+  copy:
+    src: "{{ guacamole_src_dir }}/guacamole-auth-jdbc-{{ guacamole_version }}/mysql/guacamole-auth-jdbc-mysql-{{ guacamole_version }}.jar"
+    dest: /etc/guacamole/extensions/
+    owner: "{{ guacamole_tomcat_user }}"
+    group: "{{ guacamole_tomcat_user }}"
+    remote_src: true
+  become: true
+
+- name:  Downloading MySQL Connector
+  unarchive:
+    src: "{{ guacamole_mysql_connector_package }}"
+    dest: "{{ guacamole_src_dir }}"
+    remote_src: true
+  become: true
+
+- name:  Copying MySQL Connector
+  copy:
+    src: "{{ guacamole_src_dir }}/mysql-connector-java-{{ guacamole_mysql_connector_version }}/mysql-connector-java-{{ guacamole_mysql_connector_version }}.jar" # noqa 204
+    dest: /etc/guacamole/lib/
+    owner: "{{ guacamole_tomcat_user }}"
+    group: "{{ guacamole_tomcat_user }}"
+    remote_src: true
+  become: true
+
+- name:  Creating Guacamole DB
+  mysql_db:
+    name: "{{ guacamole_mysql_db['name'] }}"
+    login_host: "{{ guacamole_mysql_db['host'] }}"
+    login_port: "{{ guacamole_mysql_db['port'] }}"
+    state: present
+  become: true
+
+- name:  Creating Guacamole DB User
+  mysql_user:
+    name: "{{ guacamole_mysql_db['username'] }}"
+    password: "{{ guacamole_mysql_db['password'] }}"
+    login_host: "{{ guacamole_mysql_db['host'] }}"
+    login_port: "{{ guacamole_mysql_db['port'] }}"
+    priv: "{{ guacamole_mysql_db['name'] }}.*:GRANT,SELECT,INSERT,UPDATE,DELETE"
+    state: present
+  become: true
+
+- name:  Checking If DB Has Been Populated
+  stat:
+    path: /etc/guacamole/.db_populated
+  register: _guacamole_db_populated_check
+
+- name:  Popluating DB
+  mysql_db:
+    name: "{{ guacamole_mysql_db['name'] }}"
+    login_host: "{{ guacamole_mysql_db['host'] }}"
+    login_port: "{{ guacamole_mysql_db['port'] }}"
+    state: import
+    target: "{{ guacamole_src_dir }}/guacamole-auth-jdbc-{{ guacamole_version }}/mysql/schema/{{ item }}"
+  become: true
+  register: _guacamole_db_populated
+  notify:
+    - "restart {{ guacamole_tomcat_service }}"
+    - kill guacd
+    - restart guacd
+  with_items:
+    - 001-create-schema.sql
+    - 002-create-admin-user.sql
+  when: not _guacamole_db_populated_check['stat']['exists']
+
+- name:  Marking DB As Populated # noqa 503
+  file:
+    path: /etc/guacamole/.db_populated
+    state: touch
+  become: true
+  when: _guacamole_db_populated['changed']

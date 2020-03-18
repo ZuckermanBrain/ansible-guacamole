@@ -12,16 +12,28 @@
     path: /usr/local/sbin/guacd
   register: _guacamole_server_installed
 
+- name: Creating a temporary directory for the build.
+  tempfile:
+    state: directory
+  register: tempbuilddir
+  when: not _guacamole_server_installed['stat']['exists']
+
+- name: Set fact for guacamole_src_dir
+  set_fact:
+    guacamole_src_dir: tempbuilddir.path
+  when: not _guacamole_server_installed['stat']['exists']
+
 - name: Downloading Guacamole Server Package
   get_url:
-    url: "{{ guacamole_dl_url + '/source/' + guacamole_server_package }}"
+    url: "{{ guacamole_dl_url }}/source/{{ guacamole_server_package }}"
     dest: "{{ guacamole_src_dir }}"
+    checksum: "{{ guacamole_server_checksum }}"
   become: true
   when: not _guacamole_server_installed['stat']['exists']
 
 - name: Extracting Guacamole Server Package
   unarchive:
-    src: "{{ guacamole_src_dir + '/' + guacamole_server_package }}"
+    src: "{{ guacamole_src_dir }}/{{ guacamole_server_package }}"
     dest: "{{ guacamole_src_dir }}"
     remote_src: true
   become: true
@@ -30,21 +42,21 @@
 - name: Configuring Guacamole Server Build
   command: ./configure --with-init-dir=/etc/init.d
   args:
-    chdir: "{{ guacamole_src_dir + '/guacamole-server-' + guacamole_version }}"
+    chdir: "{{ guacamole_src_dir }}/guacamole-server-{{ guacamole_version }}"
   become: true
   register: _guacamole_config_server_build
   when: not _guacamole_server_installed['stat']['exists']
 
 - name: Compiling Guacamole Server # noqa 503
   make:
-    chdir: "{{ guacamole_src_dir + '/guacamole-server-' + guacamole_version }}"
+    chdir: "{{ guacamole_src_dir }}/guacamole-server-{{ guacamole_version }}"
   become: true
   register: _guacamole_server_compiled
   when: "{{ _guacamole_config_server_build['changed'] | default(false, true) }}"
 
 - name: Installing Guacamole Server # noqa 503
   make:
-    chdir: "{{ guacamole_src_dir + '/guacamole-server-' + guacamole_version }}"
+    chdir: "{{ guacamole_src_dir }}/guacamole-server-{{ guacamole_version }}"
     target: install
   become: true
   register: _guacamole_server_installed
@@ -54,3 +66,9 @@
   command: ldconfig
   become: true
   when: _guacamole_server_installed['changed']
+
+- name: Remove the build dir if it exists
+  file:
+    path: "{{ guacamole_src_dir }}"
+    state: absent
+  when: guacamole_src_dir is defined

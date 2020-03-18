@@ -1,16 +1,17 @@
 ---
 - name: Downloading Guacamole Client Package
   get_url:
-    url: "{{ guacamole_dl_url + '/binary/' + guacamole_client_package }}"
+    url: "{{ guacamole_dl_url }}/binary/{{ guacamole_client_package }}"
     dest: /etc/guacamole/guacamole.war
+    checksum: "{{ guacamole_client_checksum }}"
   become: true
   register: dl
   until: dl is success
 
-- name: Creating Tomcat Symlink For {{ 'guacamole-' + guacamole_version + '.war' }}
+- name: Creating Tomcat Symlink For guacamole-{{ guacamole_version }}.war
   file:
     src: /etc/guacamole/guacamole.war
-    dest: "{{ '/var/lib/' + guacamole_tomcat + '/webapps/guacamole.war' }}"
+    dest: "/var/lib/{{ guacamole_tomcat }}/webapps/guacamole.war"
     state: link
   become: true
   notify:
@@ -19,7 +20,7 @@
     - restart guacd
 
 # Moving here to ensure idempotency as it was failing when included above
-- name: Setting Permissions On Tomcat Symlink For {{ 'guacamole-' + guacamole_version + '.war' }}
+- name: Setting Permissions On Tomcat Symlink For guacamole-{{ guacamole_version }}.war
   file:
     path: /etc/guacamole/guacamole.war
     owner: "{{ guacamole_tomcat_user }}"
