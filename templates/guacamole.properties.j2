@@ -1,4 +1,3 @@
-{{ ansible_managed | comment }}
 auth-provider: {{ guacamole_auth_provider }}
 {% if guacamole_basic_user_mapping is defined and guacamole_basic_user_mapping|string %}
 basic-user-mapping: {{ guacamole_basic_user_mapping }}

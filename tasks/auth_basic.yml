@@ -1,0 +1,11 @@
+- name: Create user-mapping.xml
+  template:
+    src: user-mapping.xml.j2
+    dest: /etc/guacamole/user-mapping.xml
+    owner: "{{ guacamole_tomcat_user }}"
+    group: "{{ guacamole_tomcat_user }}"
+  become: true
+  notify:
+    - "restart {{ guacamole_tomcat_service }}"
+    - kill guacd
+    - restart guacd

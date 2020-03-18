@@ -13,7 +13,7 @@
 
 - name: Create guacamole.properties
   template:
-    src: etc/guacamole/guacamole.properties.j2
+    src: guacamole.properties.j2
     dest: /etc/guacamole/guacamole.properties
     owner: "{{ guacamole_tomcat_user }}"
     group: "{{ guacamole_tomcat_user }}"
@@ -23,21 +23,14 @@
     - kill guacd
     - restart guacd
 
-- name: Create user-mapping.xml
-  template:
-    src: etc/guacamole/user-mapping.xml.j2
-    dest: /etc/guacamole/user-mapping.xml
-    owner: "{{ guacamole_tomcat_user }}"
-    group: "{{ guacamole_tomcat_user }}"
-  become: true
-  notify:
-    - "restart {{ guacamole_tomcat_service }}"
-    - kill guacd
-    - restart guacd
-  when: not guacamole_mysql_auth
-
-- include_tasks: auth_mysql.yml
-  when: guacamole_mysql_auth
+- name: Run auth tasks
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - 'auth_{{ guacamole_auth_provider }}.yml'
+        - 'auth_basic.yml'
+      paths:
+        - '{{ role_path }}/tasks'
 
 - name: Creating Tomcat symlink For guacamole.properties
   file:

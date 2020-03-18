@@ -9,42 +9,40 @@ guacamole_redhat_fusion_repos:
 
 # Version number, package names, and download URL
 guacamole_version: 1.1.0
-guacamole_server_package: "{{ 'guacamole-server-' + guacamole_version + '.tar.gz' }}"
-guacamole_client_package: "{{ 'guacamole-' + guacamole_version + '.war' }}"
-guacamole_dl_url: "{{ 'http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/' + guacamole_version }}"
+guacamole_server_package: "guacamole-server-{{ guacamole_version }}.tar.gz"
+guacamole_server_checksum: "274851b1a39c383c4bb89a56696159c9a42f687a962d9ebc55b5bf86e5964c79"
+guacamole_client_package: "guacamole-{{ guacamole_version }}.war"
+guacamole_client_checksum: "f46b832e919f62065506a66c936a420f572886ff8b68cbf3e31e01ca410f0f52"
+guacamole_dl_url: "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/{{guacamole_version }}"
 guacamole_src_dir: /usr/local/src
 
-# Configuration settings
+# Settings that guacamole.properties will be populated with.
 # Used by: tasks/config.yml
-guacamole_server_hostname: localhost
-guacamole_server_port: 4822
-#guacamole_basic_user_mapping: /etc/guacamole/user-mapping.xml
+guacamole_properties:
+  guacd-hostname: localhost
+  guacd-port: 4822
+  #guacd-ssl: false
+  #skip-if-unavailable: mysql, ldap
+  #basic-user-mapping: /etc/guacamole/user-mapping.xml
+  # Note: auth-provider is deprecated as of Guacamole 0.9.7 and should only be used with older versions
+  # See: https://sourceforge.net/p/guacamole/discussion/1110834/thread/8f353dd1/#175d
+  #auth-provider: net.sourceforge.guacamole.net.basic.BasicFileAuthenticationProvider
+
+
+# Authentication
+# Choose an auth provider/connector.  The following should be valid values:
+# basic, cas, duo, header, mysql, postgresql, sqlserver, ldap, openid, quickconnect, totp
+# Currently, however, only basic, cas, and ldap are implemented.
+guacamole_auth_provider: cas
+
+# Settings for basic auth
 # RDP settings
-guacamole_rdp_color_depth: 24
-guacamole_rdp_disable_auth: false
-guacamole_rdp_height: 900
-guacamole_rdp_width: 1440
-guacamole_rdp_security: rdp
-guacamole_rdp_ignore_cert: false
-
-# Auth providers
-# Authentication MySQL
-# Defines if MySQL DB should be used for authentication
-guacamole_mysql_auth: false
-guacamole_auth_provider: net.sourceforge.guacamole.net.basic.BasicFileAuthenticationProvider
-guacamole_auth_jdbc_package: "{{ 'guacamole-auth-jdbc-' + guacamole_version + '.tar.gz' }}"
-guacamole_mysql_connector_package: "{{ guacamole_mysql_connector_dl_url + 'mysql-connector-java-' + guacamole_mysql_connector_version + '.tar.gz' }}"
-
-guacamole_mysql_connector_dl_url: https://dev.mysql.com/get/Downloads/Connector-J/
-
-guacamole_mysql_connector_version: 8.0.13
-# Define MySQL DB Info
-guacamole_mysql_db:
-  name: guacamole
-  host: localhost
-  port: 3306
-  username: guacamole
-  password: guacamole
+#guacamole_rdp_color_depth: 24
+#guacamole_rdp_disable_auth: false
+#guacamole_rdp_height: 900
+#guacamole_rdp_width: 1440
+#guacamole_rdp_security: rdp
+#guacamole_rdp_ignore_cert: false
 #guacamole_users:
 # - name: user1
 #   password: password
@@ -62,5 +60,3 @@ guacamole_mysql_db:
 #       protocol: vnc
 #       port: 5901
 #       password: password
-# Define version to install
-# 0.9.13-incubating | 0.9.14 | 1.0.0 | 1.1.0

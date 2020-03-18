@@ -1,9 +1,5 @@
 ---
 - name: Example Playbook
   hosts: all
-  vars:
-    guacamole_mysql_auth: false
   roles:
-    - role: ansible-mysql
-      when: guacamole_mysql_auth|bool
-    - role: ansible-guacamole
+    - role: app-guacamole
