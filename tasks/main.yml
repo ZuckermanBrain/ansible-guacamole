@@ -19,10 +19,7 @@
         - '{{ role_path }}/tasks'
 
 - include_tasks: install_server.yml
-
 - include_tasks: config.yml
-
 # This should probably be a handler.
 - include_tasks: services.yml
-
 - include_tasks: install_client.yml

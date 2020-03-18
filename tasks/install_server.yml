@@ -1,5 +1,5 @@
 ---
-- name: install | Installing Guacamole Pre-Reqs
+- name: Installing Guacamole Pre-Reqs
   package:
     name: "{{ guacamole_prereq_pkgs }}"
     state: present
@@ -7,25 +7,27 @@
   register: result
   until: result is successful
 
-- name: install | Downloading Guacamole Server Package
+- name: Checking If Guacamole Server Is Installed
+  stat:
+    path: /usr/local/sbin/guacd
+  register: _guacamole_server_installed
+
+- name: Downloading Guacamole Server Package
   get_url:
     url: "{{ guacamole_dl_url + '/source/' + guacamole_server_package }}"
     dest: "{{ guacamole_src_dir }}"
   become: true
+  when: not _guacamole_server_installed['stat']['exists']
 
-- name: install | Extracting Guacamole Server Package
+- name: Extracting Guacamole Server Package
   unarchive:
     src: "{{ guacamole_src_dir + '/' + guacamole_server_package }}"
     dest: "{{ guacamole_src_dir }}"
     remote_src: true
   become: true
+  when: not _guacamole_server_installed['stat']['exists']
 
-- name: install | Checking If Guacamole Server Is Installed
-  stat:
-    path: /usr/local/sbin/guacd
-  register: _guacamole_server_installed
-
-- name: install | Configuring Guacamole Server Build
+- name: Configuring Guacamole Server Build
   command: ./configure --with-init-dir=/etc/init.d
   args:
     chdir: "{{ guacamole_src_dir + '/guacamole-server-' + guacamole_version }}"
@@ -33,22 +35,22 @@
   register: _guacamole_config_server_build
   when: not _guacamole_server_installed['stat']['exists']
 
-- name: install | Compiling Guacamole Server # noqa 503
+- name: Compiling Guacamole Server # noqa 503
   make:
     chdir: "{{ guacamole_src_dir + '/guacamole-server-' + guacamole_version }}"
   become: true
   register: _guacamole_server_compiled
-  when: _guacamole_config_server_build['changed']
+  when: "{{ _guacamole_config_server_build['changed'] | default(false, true) }}"
 
-- name: install | Installing Guacamole Server # noqa 503
+- name: Installing Guacamole Server # noqa 503
   make:
     chdir: "{{ guacamole_src_dir + '/guacamole-server-' + guacamole_version }}"
     target: install
   become: true
   register: _guacamole_server_installed
-  when: _guacamole_server_compiled['changed']
+  when: "{{ _guacamole_server_compiled['changed'] | default(false, true) }}"
 
-- name: install | Running ldconfig # noqa 503
+- name: Running ldconfig # noqa 503
   command: ldconfig
   become: true
   when: _guacamole_server_installed['changed']

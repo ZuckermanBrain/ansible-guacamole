@@ -1,5 +1,5 @@
 ---
-- name: Ensuring Guacamole Folders Exist
+- name: Ensure Guacamole directories exist
   file:
     path: "{{ item }}"
     state: directory
@@ -11,7 +11,7 @@
     - /etc/guacamole/lib
     - /etc/guacamole/extensions
 
-- name: Configuring guacamole.properties
+- name: Create guacamole.properties
   template:
     src: etc/guacamole/guacamole.properties.j2
     dest: /etc/guacamole/guacamole.properties
@@ -23,7 +23,7 @@
     - kill guacd
     - restart guacd
 
-- name: Configuring user-mapping.xml
+- name: Create user-mapping.xml
   template:
     src: etc/guacamole/user-mapping.xml.j2
     dest: /etc/guacamole/user-mapping.xml

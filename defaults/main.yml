@@ -1,34 +1,24 @@
 ---
 # defaults file for ansible-guacamole
 
-# Authentication MySQL
-guacamole_auth_jdbc_package: "{{ 'guacamole-auth-jdbc-' + guacamole_version + '.tar.gz' }}"
+# Additional repos for RHEL-based distros
+# Used by: tasks/RedHat.yml
+guacamole_redhat_fusion_repos:
+  - https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm
+  - https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm
 
-guacamole_auth_provider: net.sourceforge.guacamole.net.basic.BasicFileAuthenticationProvider
-
+# Version number, package names, and download URL
+guacamole_version: 1.1.0
+guacamole_server_package: "{{ 'guacamole-server-' + guacamole_version + '.tar.gz' }}"
 guacamole_client_package: "{{ 'guacamole-' + guacamole_version + '.war' }}"
-
 guacamole_dl_url: "{{ 'http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/' + guacamole_version }}"
+guacamole_src_dir: /usr/local/src
 
+# Configuration settings
+# Used by: tasks/config.yml
 guacamole_server_hostname: localhost
-
-# Defines if MySQL DB should be used for authentication
-guacamole_mysql_auth: false
-
-guacamole_mysql_connector_package: "{{ guacamole_mysql_connector_dl_url + 'mysql-connector-java-' + guacamole_mysql_connector_version + '.tar.gz' }}"
-
-guacamole_mysql_connector_dl_url: https://dev.mysql.com/get/Downloads/Connector-J/
-
-guacamole_mysql_connector_version: 8.0.13
-
-# Define MySQL DB Info
-guacamole_mysql_db:
-  name: guacamole
-  host: localhost
-  port: 3306
-  username: guacamole
-  password: guacamole
-
+guacamole_server_port: 4822
+#guacamole_basic_user_mapping: /etc/guacamole/user-mapping.xml
 # RDP settings
 guacamole_rdp_color_depth: 24
 guacamole_rdp_disable_auth: false
@@ -37,19 +27,25 @@ guacamole_rdp_width: 1440
 guacamole_rdp_security: rdp
 guacamole_rdp_ignore_cert: false
 
-guacamole_redhat_fusion_repos:
-  - https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm
-  - https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm
+# Auth providers
+# Authentication MySQL
+# Defines if MySQL DB should be used for authentication
+guacamole_mysql_auth: false
+guacamole_auth_provider: net.sourceforge.guacamole.net.basic.BasicFileAuthenticationProvider
+guacamole_auth_jdbc_package: "{{ 'guacamole-auth-jdbc-' + guacamole_version + '.tar.gz' }}"
+guacamole_mysql_connector_package: "{{ guacamole_mysql_connector_dl_url + 'mysql-connector-java-' + guacamole_mysql_connector_version + '.tar.gz' }}"
 
-guacamole_server_package: "{{ 'guacamole-server-' + guacamole_version + '.tar.gz' }}"
+guacamole_mysql_connector_dl_url: https://dev.mysql.com/get/Downloads/Connector-J/
 
-guacamole_server_port: 4822
-
-#guacamole_basic_user_mapping: /etc/guacamole/user-mapping.xml
-
-guacamole_src_dir: /usr/local/src
-
-guacamole_users: []
+guacamole_mysql_connector_version: 8.0.13
+# Define MySQL DB Info
+guacamole_mysql_db:
+  name: guacamole
+  host: localhost
+  port: 3306
+  username: guacamole
+  password: guacamole
+#guacamole_users:
 # - name: user1
 #   password: password
 #   connections:
@@ -68,4 +64,3 @@ guacamole_users: []
 #       password: password
 # Define version to install
 # 0.9.13-incubating | 0.9.14 | 1.0.0 | 1.1.0
-guacamole_version: 1.1.0
