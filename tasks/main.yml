@@ -23,3 +23,9 @@
 # This should probably be a handler.
 - include_tasks: services.yml
 - include_tasks: install_client.yml
+
+- name: Remove the build dir if it exists
+  file:
+    path: "{{ guacamole_src_dir }}"
+    state: absent
+  when: guacamole_src_dir is defined

@@ -24,7 +24,7 @@
     - restart guacd
 
 - name: Run auth tasks
-  include_tasks: "auth_{{ guacamole_auth_provider }}.yml"
+  include_tasks: "auth_{{ item }}.yml"
   loop: "{{ guacamole_auth_providers }}"
   when: guacamole_auth_providers is defined
 

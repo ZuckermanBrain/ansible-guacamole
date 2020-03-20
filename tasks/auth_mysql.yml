@@ -8,8 +8,9 @@
 
 - name: Extracting Auth JDBC Library
   unarchive:
-    src: "{{ guacamole_dl_url }}/binary/{{ guacamole_auth_jdbc_package }}"
+    src: "{{ guacamole_src_dir }}/{{ guacamole_auth_jdbc_package }}"
     dest: "{{ guacamole_src_dir }}"
+    remote_src: true
   become: true
 
 - name:  Copying Auth JDBC Connector

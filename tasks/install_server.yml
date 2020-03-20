@@ -20,7 +20,7 @@
 
 - name: Set fact for guacamole_src_dir
   set_fact:
-    guacamole_src_dir: tempbuilddir.path
+    guacamole_src_dir: "{{ tempbuilddir.path }}"
   when: not _guacamole_server_installed['stat']['exists']
 
 - name: Downloading Guacamole Server Package
@@ -66,9 +66,3 @@
   command: ldconfig
   become: true
   when: _guacamole_server_installed['changed']
-
-- name: Remove the build dir if it exists
-  file:
-    path: "{{ guacamole_src_dir }}"
-    state: absent
-  when: guacamole_src_dir is defined
