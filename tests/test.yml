@@ -1,6 +1,39 @@
 ---
-- name: Example Playbook
-  hosts: all
+- name: Install certificates.
+  hosts: guacamole_server
+  become: true
+  vars_files:
+    - /etc/ansible/vars/guacamole_ssl_certificates.yml
+  tasks:
+    - name: make sure SSL certificate directory exists
+      file:
+        path: '{{ guacamole_ssl_cert_dir }}'
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: make sure SSL certificate is installed
+      copy:
+        content: '{{ guacamole_ssl_certificate }}'
+        dest: '{{ guacamole_ssl_certificate_path }}'
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: make sure SSL private key is installed
+      copy:
+        content: '{{ guacamole_ssl_private_key }}'
+        dest: '{{ guacamole_ssl_private_key_path }}'
+        owner: root
+        group: root
+        mode: 0600
+      no_log: true
+
+- name: Install Guacamole and reverse proxy
+  hosts: guacamole_server
+  become: true
   roles:
+    - role: app-apache
     - role: app-mysql
     - role: app-guacamole
