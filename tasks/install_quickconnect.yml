@@ -1,0 +1,23 @@
+- name: Downloading Quickconnect plugin
+  get_url:
+    url: "{{ guacamole_dl_url }}/binary/{{ guacamole_auth_quickconnect_package }}"
+    dest: "{{ guacamole_src_dir }}"
+    checksum: "{{ guacamole_auth_quickconnect_checksum }}"
+  become: true
+
+- name: Extracting Quickconnect plugin
+  unarchive:
+    src: "{{ guacamole_src_dir }}/{{ guacamole_auth_quickconnect_package }}"
+    dest: "{{ guacamole_src_dir }}"
+    remote_src: true
+  become: true
+
+- name:  Copying Quickconnect plugin
+  copy:
+    src: "{{ guacamole_src_dir }}/guacamole-auth-quickconnect-{{ guacamole_version }}/guacamole-auth-quickconnect-{{ guacamole_version }}.jar"
+    dest: /etc/guacamole/extensions/
+    owner: "{{ guacamole_tomcat_user }}"
+    group: "{{ guacamole_tomcat_user }}"
+    remote_src: true
+  become: true
+

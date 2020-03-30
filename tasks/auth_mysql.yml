@@ -56,32 +56,70 @@
     state: present
   become: true
 
-- name:  Checking If DB Has Been Populated
+- name:  Checking If DB schema Has Been Populated
   stat:
-    path: /etc/guacamole/.db_populated
+    path: /etc/guacamole/.db_schema_populated
   register: _guacamole_db_populated_check
 
-- name:  Popluating DB
+- name: Creating Guacamole database schema
   mysql_db:
     name: "{{ guacamole_mysql_db['name'] }}"
     login_host: "{{ guacamole_mysql_db['host'] }}"
     login_port: "{{ guacamole_mysql_db['port'] }}"
     state: import
-    target: "{{ guacamole_src_dir }}/guacamole-auth-jdbc-{{ guacamole_version }}/mysql/schema/{{ item }}"
+    target: "{{ guacamole_src_dir }}/guacamole-auth-jdbc-{{ guacamole_version }}/mysql/schema/001-create-schema.sql"
   become: true
-  register: _guacamole_db_populated
+  register: _guacamole_db_schema_populated
   notify:
     - "restart {{ guacamole_tomcat_service }}"
     - kill guacd
     - restart guacd
-  with_items:
-    - 001-create-schema.sql
-    - 002-create-admin-user.sql
   when: not _guacamole_db_populated_check['stat']['exists']
 
-- name:  Marking DB As Populated # noqa 503
+- name:  Marking DB schema as Populated # noqa 503
   file:
-    path: /etc/guacamole/.db_populated
+    path: /etc/guacamole/.db_schema_populated
     state: touch
   become: true
-  when: _guacamole_db_populated['changed']
+  when: "{{ _guacamole_db_populated['changed'] | default(false, true) }}"
+
+- name: Creating administrative user
+  mysql_db:
+    name: "{{ guacamole_mysql_db['name'] }}"
+    login_host: "{{ guacamole_mysql_db['host'] }}"
+    login_port: "{{ guacamole_mysql_db['port'] }}"
+    state: import
+    target: "{{ guacamole_src_dir }}/guacamole-auth-jdbc-{{ guacamole_version }}/mysql/schema/002-create-admin-user.sql"
+  become: true
+  notify:
+    - "restart {{ guacamole_tomcat_service }}"
+    - kill guacd
+    - restart guacd
+  when: "{{ guacamole_admin_users | default(false, true) }}"
+
+- name: Generating SQL code to give administrative access to Guacamole admins
+  template:
+    src: create-admin-users.sql.j2
+    dest: /tmp/create-admin-users.sql
+  become: true
+  when: guacamole_admin_users is defined
+
+- name: Creating entries for administrative users in database.
+  mysql_db:
+    name: "{{ guacamole_mysql_db['name'] }}"
+    login_host: "{{ guacamole_mysql_db['host'] }}"
+    login_port: "{{ guacamole_mysql_db['port'] }}"
+    state: import
+    target: /tmp/create-admin-users.sql
+  become: true
+  notify:
+    - "restart {{ guacamole_tomcat_service }}"
+    - kill guacd
+    - restart guacd
+  when: guacamole_admin_users is defined
+
+- name: Remove SQL code used to generate administration users
+  file:
+    path: /tmp/create-admin-users.sql
+    state: absent
+  when: guacamole_admin_users is defined
