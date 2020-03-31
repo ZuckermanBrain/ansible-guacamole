@@ -16,3 +16,10 @@
   register: result
   until: result is successful
   when: ansible_distribution != "Fedora"
+
+- name: redhat | Adding font used by Guacamole for ssh sessions
+  yum:
+    name: dejavu-sans-mono-fonts
+    state: present
+  become: true
+
