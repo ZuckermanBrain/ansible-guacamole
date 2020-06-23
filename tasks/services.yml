@@ -5,3 +5,10 @@
     enabled: true
     state: started
   become: true
+
+- name: Ensuring Tomcat Is Enabled And Starts On Boot
+  service:
+    name: "{{ guacamole_tomcat_service }}"
+    enabled: true
+    state: started
+  become: true

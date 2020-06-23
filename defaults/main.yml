@@ -26,22 +26,41 @@ guacamole_properties:
   # Note: auth-provider is deprecated as of Guacamole 0.9.7 and should only be used with older versions
   # See: https://sourceforge.net/p/guacamole/discussion/1110834/thread/8f353dd1/#175d
   #auth-provider: net.sourceforge.guacamole.net.basic.BasicFileAuthenticationProvider
-  # Note: use these if you are using MySQL for auth (see below).
+  # Note: Use these if you are using MySQL for auth (see below).
   #mysql-hostname: {{ guacamole_mysql_db['host'] }}
   #mysql-port: {{ guacamole_mysql_db['port'] }}
   #mysql-database: {{ guacamole_mysql_db['name'] }}
   #mysql-username: {{ guacamole_mysql_db['username'] }}
   #mysql-password: {{ guacamole_mysql_db['password'] }} 
-  # Note: use these if you are using CAS for auth.
+  # Note: Use these if you are using CAS for auth.
   #cas-authorization-endpoint: https://example.com
   #cas-redirect-uri: https://example.net
   #cas-clearpass-key: /path/to/key
+  # Note: Use these if you are using LDAP for auth.
+  #ldap-hostname:
+  #ldap-port:
+  #ldap-encryption-method:
+  #ldap-max-search-results:
+  #ldap-search-bind-dn:
+  #ldap-search-bind-password:
+  #ldap-user-base-dn: "ou=people,dc=example,dc=net"
+  #ldap-username-attribute:
+  #ldap-member-attribute:
+  #ldap-user-attributes:
+  #ldap-user-search-filter:
+  #ldap-config-base-dn:
+  #ldap-group-base-dn:
+  #ldap-group-name-attribute:
+  #ldap-dereference-aliases:
+  #ldap-follow-referrals:
+  #ldap-max-referral-hops:
+  #ldap-operation-timeout:
 
 # Authentication
 # Choose an auth provider/connector.  The following should be valid values:
 # basic, cas, duo, header, mysql, postgresql, sqlserver, ldap, openid, quickconnect, totp
 # Currently, however, only basic, cas, and ldap are implemented.
-guacamole_auth_providers: [cas, mysql]
+guacamole_auth_providers: [ldap, mysql]
 
 # Settings for basic auth
 # RDP settings
@@ -89,6 +108,10 @@ guacamole_mysql_db:
 # Settings for CAS auth
 guacamole_auth_cas_package: "guacamole-auth-cas-{{ guacamole_version }}.tar.gz"
 guacamole_auth_cas_checksum: "sha256:{{ guacamole_dl_url }}/binary/{{ guacamole_auth_cas_package }}.sha256"
+
+# Settings for LDAP auth
+guacamole_auth_ldap_package: "guacamole-auth-ldap-{{ guacamole_version }}.tar.gz"
+guacamole_auth_ldap_checksum: "sha256:{{ guacamole_dl_url }}/binary/{{ guacamole_auth_ldap_package }}.sha256"
 
 # Used to define admin users other than guacadmin.
 #guacamole_admin_users: []
