@@ -23,6 +23,17 @@
     - kill guacd
     - restart guacd
 
+- name: Creating a temporary directory for auth modules.
+  tempfile:
+    state: directory
+  register: tempbuilddir
+  when: guacamole_auth_providers is defined and guacamole_src_dir is not defined
+
+- name: Set fact for guacamole_src_dir
+  set_fact:
+    guacamole_src_dir: "{{ tempbuilddir.path }}"
+  when: guacamole_auth_providers is defined and guacamole_src_dir is not defined
+
 - name: Run auth tasks
   include_tasks: "auth_{{ item }}.yml"
   loop: "{{ guacamole_auth_providers }}"
