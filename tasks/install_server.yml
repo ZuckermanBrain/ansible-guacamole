@@ -16,12 +16,10 @@
   tempfile:
     state: directory
   register: tempbuilddir
-  when: not _guacamole_server_installed['stat']['exists']
 
 - name: Set fact for guacamole_src_dir
   set_fact:
     guacamole_src_dir: "{{ tempbuilddir.path }}"
-  when: not _guacamole_server_installed['stat']['exists']
 
 - name: Downloading Guacamole Server Package
   get_url:

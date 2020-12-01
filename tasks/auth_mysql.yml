@@ -83,6 +83,13 @@
   become: true
   when: "{{ _guacamole_db_populated['changed'] | default(false, true) }}"
 
+- name:  Marking DB schema as Populated # noqa 503
+  file:
+    path: /etc/guacamole/.db_schema_populated
+    state: touch
+  become: true
+  when: "{{ _guacamole_db_populated['changed'] | default(false, true) }}"
+
 - name: Creating administrative user
   mysql_db:
     name: "{{ guacamole_mysql_db['name'] }}"
