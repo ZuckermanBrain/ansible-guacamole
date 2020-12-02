@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2020 Larry Smith Jr.
+Copyright (c) 2020 Larry Smith Jr., Trustees of Columbia University in the City of New York.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
